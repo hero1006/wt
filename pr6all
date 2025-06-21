@@ -1,0 +1,222 @@
+CREATE TABLE crud (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  mobile VARCHAR(20) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+connect.php
+
+<?php
+$con=new mysqli('localhost','root','','wt');
+if(!$con){
+    die(mysqli_error($con));
+}
+else{
+    echo "Connection successful!!";
+}
+?>
+
+Create.php
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>crud operation</title>
+</head>
+<body>
+    <div class="container my-5">       
+         <form method="post">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Enter full name" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" name="email" placeholder="Enter the email" autocomplete="off">
+ </div>
+            <div class="form-group">
+                <label>Mobile</label>
+                <input type="text" class="form-control" name="mobile" placeholder="Enter the mobile number" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Enter the password" autocomplete="off">
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</html>
+<?php
+include 'connect.php';
+if (isset($_POST['submit'])) {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $mobile = $_POST['mobile'];
+    $password = $_POST['password'];
+    $sql="INSERT INTO crud (name,	email,	mobile,	password	) values('$name','$email','$mobile','$password')";
+    $result=mysqli_query($con,$sql);
+    if($result)
+    {
+        // echo "Data insert successfull";
+        header('location:read.php');
+    }else{
+        die(mysqli_error($con)); }}
+?>
+
+read.php
+<?php
+include 'connect.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curd Operation</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="container">
+
+    <button class="btn btn-primary my-5"><a href="create.php" class="text-light"> Add User</a>
+       </button>
+       <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Sr.no</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Mobile</th>
+      <th scope="col">Password</th>
+      <th scope="col">Operation</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+
+  <?php
+   $sql="SELECT * FROM crud";
+   $result=mysqli_query($con,$sql);
+   if($result)
+   {
+    while($row=mysqli_fetch_assoc($result))
+    {
+        $id=$row['id'];
+        $name=$row['name'];
+        $email=$row['email'];
+        $mobile=$row['mobile'];
+        $password=$row['password'];
+
+        echo '<tr>
+      <th scope="row">'.$id.'</th>
+      <td>'.$name.'</td>
+      <td>'.$email.'</td>
+      <td>'.$mobile.'</td>
+      <td>'.$password.'</td>
+      <td>
+    <button class="btn btn-primary"><a href="update.php?updateid='.$id.'" class="text-light">Update</a></button>
+    <button class="btn btn-danger"><a href="delete.php?deleteid='.$id.'" class="text-light">Delete</a></button>
+   </td>
+    </tr>';
+
+    }
+   }
+  ?>
+
+  
+  </tbody>
+</table>    
+    </div>
+</body>
+</html>
+
+update.php
+<?php
+include 'connect.php';
+$id=$_GET['updateid'];
+$sql="SELECT * FROM crud where id=$id";
+$result=mysqli_query($con,$sql); 
+$row=mysqli_fetch_assoc($result);
+$name=$row['name'];
+$email=$row['email'];
+$mobile=$row['mobile'];
+$password=$row['password'];
+
+if (isset($_POST['submit'])) {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $mobile = $_POST['mobile'];
+    $password = $_POST['password'];
+
+    $sql="UPDATE crud set id=$id,name='$name',email='$email', mobile='$mobile', password='$password' where id=$id"; 
+    $result=mysqli_query($con,$sql);
+    if($result){
+       echo "Update Data successfull";
+        header('location:read.php');
+    }
+    else{
+        die(mysqli_error($con)); } }
+?>
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>crud operation</title>
+</head>
+<body>
+    <div class="container my-5">
+        <form method="post">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Enter full name" autocomplete="off" 
+                value=<?php echo $name;?>>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" name="email" placeholder="Enter the email" autocomplete="off"
+                value=<?php echo $email; ?>>
+            </div>
+            <div class="form-group">
+                <label>Mobile</label>
+                <input type="text" class="form-control" name="mobile" placeholder="Enter the mobile number" autocomplete="off"
+                value=<?php echo $mobile;?>> </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Enter the password" autocomplete="off"
+                value=<?php echo $password ?>>  </div>
+            <button type="submit" name="submit" class="btn btn-primary">Update</button></form> </div></html>
+delete.php
+<?php
+include 'connect.php';
+if(isset($_GET['deleteid']))
+{
+    $id=$_GET['deleteid'];
+    $sql="DELETE FROM crud WHERE id=$id";
+    $result=mysqli_query($con,$sql);
+    if($result)
+    {
+        // echo "delete successfull!";
+        header('location:read.php');
+    }
+    else{
+        die(mysqli_error($con));
+    }
+}
+?>
+
+
+
