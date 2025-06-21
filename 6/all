@@ -1,0 +1,104 @@
+database.c
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    gmail VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+create.php
+<?php
+include 'connect.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $gmail = $_POST['gmail'];
+    $password = $_POST['password'];
+
+    $sql = "INSERT INTO users (name, gmail, password) VALUES ('$name', '$gmail', '$password')";
+    if (mysqli_query($conn, $sql)) {
+        echo "Record created successfully.";
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+?>
+<form method="POST">
+    Name: <input type="text" name="name"><br>
+    Gmail: <input type="email" name="gmail"><br>
+    Password: <input type="password" name="password"><br>
+    <input type="submit" value="Create">
+</form>
+
+read.php
+<?php
+include 'connect.php';
+
+$sql = "SELECT * FROM users";
+$result = mysqli_query($conn, $sql);
+
+echo "<table border='1'>
+<tr><th>ID</th><th>Name</th><th>Gmail</th><th>Password</th><th>Actions</th></tr>";
+
+while ($row = mysqli_fetch_assoc($result)) {
+    echo "<tr>
+        <td>{$row['id']}</td>
+        <td>{$row['name']}</td>
+        <td>{$row['gmail']}</td>
+        <td>{$row['password']}</td>
+        <td>
+            <a href='update.php?id={$row['id']}'>Edit</a> |
+            <a href='delete.php?id={$row['id']}'>Delete</a>
+        </td>
+    </tr>";
+}
+echo "</table>";
+?>
+
+update.php
+<?php
+include 'connect.php';
+
+$id = $_GET['id'];
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $gmail = $_POST['gmail'];
+    $password = $_POST['password'];
+
+    $sql = "UPDATE users SET name='$name', gmail='$gmail', password='$password' WHERE id=$id";
+    if (mysqli_query($conn, $sql)) {
+        echo "Record updated successfully.";
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+
+// Fetch old data
+$sql = "SELECT * FROM users WHERE id=$id";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+?>
+
+<form method="POST">
+    Name: <input type="text" name="name" value="<?= $row['name'] ?>"><br>
+    Gmail: <input type="email" name="gmail" value="<?= $row['gmail'] ?>"><br>
+    Password: <input type="password" name="password" value="<?= $row['password'] ?>"><br>
+    <input type="submit" value="Update">
+</form>
+
+delete.php
+<?php
+include 'connect.php';
+
+$id = $_GET['id'];
+
+$sql = "DELETE FROM users WHERE id=$id";
+if (mysqli_query($conn, $sql)) {
+    echo "Record deleted successfully.";
+} else {
+    echo "Error: " . mysqli_error($conn);
+}
+?>
+<a href="read.php">Back to list</a>
